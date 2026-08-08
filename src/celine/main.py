@@ -1,5 +1,20 @@
-"""Application composition root.
+"""FastAPI entry point for the Celine backend."""
 
-FastAPI startup and dependency wiring will live here once the first runtime
-slice is implemented.
-"""
+from fastapi import FastAPI
+
+from celine import __version__
+from celine.core.settings import get_settings
+
+settings = get_settings()
+
+app = FastAPI(
+    title="Celine",
+    description="Personal technology assistant backend.",
+    version=__version__,
+)
+
+
+@app.get("/health", tags=["system"])
+async def health_check() -> dict[str, str]:
+    """Return a lightweight liveness response."""
+    return {"status": "ok", "environment": settings.environment}
