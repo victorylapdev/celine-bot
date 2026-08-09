@@ -1,6 +1,7 @@
 """Ephemeral execution context for a single Agent request."""
 
 from typing import Any
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -33,6 +34,8 @@ class ExecutionContext(BaseModel):
     tool_calls: list[ToolCall] = Field(default_factory=list)
     tool_executions: list[ToolExecutionRecord] = Field(default_factory=list)
     errors: list[AgentErrorRecord] = Field(default_factory=list)
+    session_id: UUID | None = None
+    retrieved_memory_ids: list[UUID] = Field(default_factory=list)
     tool_iterations: int = 0
 
     @classmethod

@@ -4,6 +4,8 @@ import argparse
 
 from celine.ai.providers.deepseek import DeepSeekClient
 from celine.core.agent import Agent
+from celine.core.settings import get_settings
+from celine.memory.factory import build_postgres_memory_manager
 from celine.tools.builtin import SystemInfoTool
 from celine.tools.registry import ToolRegistry
 
@@ -21,7 +23,13 @@ def main() -> None:
     parser.add_argument("message", help="Mensagem que será enviada à DeepSeek.")
     args = parser.parse_args()
 
-    result = Agent(DeepSeekClient(), build_default_registry()).run(args.message)
+    settings = get_settings()
+    memory_manager = (
+        build_postgres_memory_manager(settings.database_url) if settings.database_url else None
+    )
+    result = Agent(DeepSeekClient(), build_default_registry(), memory_manager=memory_manager).run(
+        args.message
+    )
     if not result.succeeded:
         raise RuntimeError(result.error.message if result.error else "Falha desconhecida no Agent.")
     print(result.response)
