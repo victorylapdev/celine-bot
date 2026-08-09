@@ -2,7 +2,17 @@
 
 import argparse
 
-from celine.ai.providers.deepseek import ChatMessage, DeepSeekClient
+from celine.ai.providers.deepseek import DeepSeekClient
+from celine.assistant.orchestration import ToolCallingOrchestrator
+from celine.tools.builtin import SystemInfoTool
+from celine.tools.registry import ToolRegistry
+
+
+def build_default_registry() -> ToolRegistry:
+    """Compose the tools enabled for the local Celine runtime."""
+    registry = ToolRegistry()
+    registry.register(SystemInfoTool())
+    return registry
 
 
 def main() -> None:
@@ -11,7 +21,7 @@ def main() -> None:
     parser.add_argument("message", help="Mensagem que será enviada à DeepSeek.")
     args = parser.parse_args()
 
-    answer = DeepSeekClient().reply([ChatMessage(role="user", content=args.message)])
+    answer = ToolCallingOrchestrator(DeepSeekClient(), build_default_registry()).respond(args.message)
     print(answer)
 
 

@@ -26,3 +26,15 @@ class Tool[InputT: ToolInput](ABC):
     @abstractmethod
     def execute(self, parameters: InputT) -> dict[str, Any]:
         """Execute the capability with validated parameters."""
+
+    @classmethod
+    def as_function_definition(cls) -> dict[str, Any]:
+        """Return the OpenAI-compatible function schema used by LLM providers."""
+        return {
+            "type": "function",
+            "function": {
+                "name": cls.name,
+                "description": cls.description,
+                "parameters": cls.input_model.model_json_schema(),
+            },
+        }

@@ -11,3 +11,7 @@ class DuplicateToolError(ToolError):
 
 class ToolNotFoundError(ToolError):
     """Raised when an unknown tool is requested."""
+
+
+class ToolExecutionError(ToolError):
+    """Raised when a registered tool fails while executing."""

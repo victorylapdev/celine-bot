@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from celine.tools.base import Tool, ToolInput
-from celine.tools.errors import DuplicateToolError, ToolNotFoundError
+from celine.tools.errors import DuplicateToolError, ToolExecutionError, ToolNotFoundError
 
 
 class ToolRegistry:
@@ -30,8 +30,15 @@ class ToolRegistry:
         """List all registered tools in registration order."""
         return tuple(self._tools.values())
 
+    def as_function_definitions(self) -> tuple[dict[str, Any], ...]:
+        """Convert all registered tools into OpenAI-compatible function schemas."""
+        return tuple(tool.as_function_definition() for tool in self._tools.values())
+
     def execute(self, name: str, parameters: Mapping[str, Any] | None = None) -> dict[str, Any]:
         """Validate input and execute a registered tool by name."""
         tool = self.get(name)
         validated_parameters = tool.input_model.model_validate(parameters or {})
-        return tool.execute(validated_parameters)
+        try:
+            return tool.execute(validated_parameters)
+        except Exception as error:
+            raise ToolExecutionError(f"A ferramenta '{name}' falhou durante a execução.") from error
