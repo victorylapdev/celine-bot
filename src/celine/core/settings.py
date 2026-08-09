@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     port: int = Field(default=8000, ge=1, le=65535)
     ai_provider: str = "openai"
     openai_api_key: str | None = None
+    deepseek_api_key: str | None = None
+    deepseek_base_url: str = "https://api.deepseek.com"
+    deepseek_model: str = "deepseek-chat"
     database_url: str | None = None
     redis_url: str | None = None
     mqtt_url: str | None = None
