@@ -3,7 +3,7 @@
 import argparse
 
 from celine.ai.providers.deepseek import DeepSeekClient
-from celine.assistant.orchestration import ToolCallingOrchestrator
+from celine.core.agent import Agent
 from celine.tools.builtin import SystemInfoTool
 from celine.tools.registry import ToolRegistry
 
@@ -21,8 +21,10 @@ def main() -> None:
     parser.add_argument("message", help="Mensagem que será enviada à DeepSeek.")
     args = parser.parse_args()
 
-    answer = ToolCallingOrchestrator(DeepSeekClient(), build_default_registry()).respond(args.message)
-    print(answer)
+    result = Agent(DeepSeekClient(), build_default_registry()).run(args.message)
+    if not result.succeeded:
+        raise RuntimeError(result.error.message if result.error else "Falha desconhecida no Agent.")
+    print(result.response)
 
 
 if __name__ == "__main__":
